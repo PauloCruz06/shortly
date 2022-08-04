@@ -31,3 +31,15 @@ export async function signinValidation(body) {
 
     return value;
 }
+
+export async function urlValidation(body) {
+    const schema = Joi.object({
+        url: Joi.string().uri().required()
+    });
+
+    const value = schema.validate({
+        url: body.url
+    });
+
+    return value;
+}
