@@ -17,3 +17,17 @@ export async function signupValidation(body) {
 
     return value;
 }
+
+export async function signinValidation(body) {
+    const schema = Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().required()
+    });
+
+    const value = schema.validate({
+        email: body.email,
+        password: body.password
+    });
+
+    return value;
+}
