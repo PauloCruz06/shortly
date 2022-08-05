@@ -55,5 +55,36 @@ export async function deleteUrl(req, res) {
     } catch(e) {
         res.status(500).send(e);
     }
+}
 
+export async function getUserLinks(_, res) {
+    try {
+        const { userId } = res.locals;
+        console.log(userId);
+        const { rows: userList } = await connection.query(`
+            SELECT
+                users.id AS "id",
+                users.name AS "name",
+                SUM(links.views) AS "visitCount",
+                json_agg(
+                    json_build_object(
+                        'id', links.id,
+                        'shortUrl', links."shortUrl",
+                        'url', links.url,
+                        'visitCount', links.views
+                    )
+                ) as "shortenedUrls"
+            FROM users 
+            JOIN links ON
+            users.id = links."userId"
+            WHERE users.id = $1
+            GROUP BY users.id
+        `, [userId]);
+
+        if(userList <= 0) return res.sendStatus(404);
+
+        res.status(200).send(...userList);
+    } catch(e) {
+        res.status(500).send(e);
+    }
 }
