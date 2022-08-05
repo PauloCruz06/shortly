@@ -10,7 +10,7 @@ export async function postUrl(req, res) {
         
         if(value.error) return res.status(422).send(value.error.details);
         
-        const shortUrl = nanoid()
+        const shortUrl = nanoid(10);
 
         await connection.query(`
             INSERT INTO links (
