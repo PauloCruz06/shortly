@@ -50,3 +50,27 @@ export async function openUrl(req, res) {
         res.status(500).send(e);   
     }
 }
+
+export async function getRanking(_, res) {
+    try {
+        const { rows: ranking } = await connection.query(`
+            SELECT 
+            users.id AS "id", 
+            users.name as "name",
+            COUNT(links.url) AS "linksCount",
+            COALESCE(SUM(links.views), 0) AS "visitCount"
+            FROM users
+            LEFT JOIN links ON
+            users.id = links."userId"
+            GROUP BY users.id
+            ORDER BY 
+                "visitCount" DESC,
+                "linksCount" DESC
+            LIMIT 10;
+        `);
+
+        res.status(200).send(ranking);
+    } catch(e) {
+        res.status(500).send(e);
+    }
+}
